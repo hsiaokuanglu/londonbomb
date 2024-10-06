@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://rqx8dxsq1ye0"]
+
+[ext_resource type="Texture2D" uid="uid://djmykmtl1kb65" path="res://art/cutter.png" id="1_ng6g3"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_pyvy5"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_ng6g3")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Cutter" type="AnimatedSprite2D"]
+sprite_frames = SubResource("SpriteFrames_pyvy5")

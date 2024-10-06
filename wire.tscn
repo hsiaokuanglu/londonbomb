@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://ducya1mvo5mu4"]
+
+[ext_resource type="Texture2D" uid="uid://dhoc1o3aqmlbx" path="res://art/wire.png" id="1_qing3"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_0ip56"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_qing3")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Wire" type="AnimatedSprite2D"]
+sprite_frames = SubResource("SpriteFrames_0ip56")

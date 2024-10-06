@@ -1,0 +1,41 @@
+[gd_scene load_steps=5 format=3 uid="uid://dmu01bs13gw45"]
+
+[ext_resource type="Script" path="res://game.gd" id="1_02aed"]
+[ext_resource type="PackedScene" uid="uid://ducya1mvo5mu4" path="res://wire.tscn" id="2_gukal"]
+[ext_resource type="PackedScene" uid="uid://rqx8dxsq1ye0" path="res://cutter.tscn" id="3_vytxn"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_avjc7"]
+size = Vector2(1152, 595)
+
+[node name="Game" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_02aed")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="TouchArea" type="Area2D" parent="Control"]
+
+[node name="Cutter" parent="Control/TouchArea" instance=ExtResource("3_vytxn")]
+position = Vector2(333, 363)
+
+[node name="Wire" parent="Control/TouchArea" instance=ExtResource("2_gukal")]
+position = Vector2(499, 182)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Control/TouchArea"]
+position = Vector2(576, 297.5)
+shape = SubResource("RectangleShape2D_avjc7")
+
+[node name="Action" type="Button" parent="."]
+offset_left = 508.0
+offset_top = 606.0
+offset_right = 594.0
+offset_bottom = 648.0
+text = "Action"
+
+[connection signal="input_event" from="Control/TouchArea" to="." method="_on_touch_area_input_event"]
