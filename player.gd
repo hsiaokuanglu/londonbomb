@@ -25,10 +25,15 @@ func set_uncut_wire_count(wire_count: int):
 	$VBoxContainer/WireNumCon/Count.text = str(wire_count)
 
 func _on_button_pressed() -> void:
-	client_scene.rpc("pick_player", player_id)
+	#client_scene.rpc("pick_player", player_id)
+	$WireBoxCon.show()
+	$WireBoxCon.position = Vector2(get_viewport().size.x / 2, get_viewport().size.y / 2)
 
 func _hide_cut_button():
 	$VBoxContainer/CutButton.hide()
 
 func _show_cut_button():
 	$VBoxContainer/CutButton.show()
+
+func _cutter_follow():
+	pass
