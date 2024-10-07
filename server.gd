@@ -28,11 +28,11 @@ var _ui_claim = $ClaimUI
 func add_player(client_id):
 	#connected_peer_ids.append(client_id)
 	_players[client_id] = ""
-	var player_character = preload("res://game.tscn").instantiate()
-	player_character.set_multiplayer_authority(client_id)
-	add_child(player_character)
-	if client_id == multiplayer.get_unique_id():
-		local_player_character = player_character
+	#var player_character = preload("res://game.tscn").instantiate()
+	#player_character.set_multiplayer_authority(client_id)
+	#add_child(player_character)
+	#if client_id == multiplayer.get_unique_id():
+		#local_player_character = player_character
 
 @rpc	
 func add_newly_connected_player_character(new_peer_id):
@@ -102,6 +102,7 @@ func _on_connection_established():
 	$NetworkContainer/Join.hide()
 
 	_ui_settings_container.show()
+	$NetworkContainer/LobbyContainer.show()
 	$Label.text = "Connected to server"
 
 
@@ -122,14 +123,14 @@ func _remove_player(id):
 
 func _on_settings_apply_button_pressed() -> void:
 	var local_id = multiplayer.get_unique_id()
-	var _p_name = _ui_settings_container.get_node("EnterName").text
+	var _p_name = _ui_settings_container.get_node("NameCon/EnterName").text
 	#local_player_character.rpc("_update_player_name", local_id, $SettingsContainer/EnterName.text)
 	_update_player_name(local_id, _p_name)
 	for id in _players.keys():
 		if id != local_id:
 			rpc_id(id, "_update_player_name", local_id, _p_name)
 	rpc_id(1, "_update_player_name", local_id, _p_name)
-	$NetworkContainer/LobbyContainer.show()
+	
 
 
 @rpc("any_peer", "reliable")
@@ -244,6 +245,8 @@ func _set_player_grid(players):
 			_player_cards[id] = player_scene
 
 func _next_round():
+	if _round == 1:
+		bomb_explodes()
 	_round -= 1
 	_cut_this_round = 0
 	for cards in _cards["in_play"].values():
@@ -328,9 +331,6 @@ func cut_wire_from_server(picking_id, picked_id):
 func next_round_timeout():
 	_next_round()
 
-func foo(): # debug
-	for id in _players.keys():
-		rpc_id(id, "_set_player_grid", _players)
 
 func bomb_defused():
 	for id in _players.keys():

@@ -28,13 +28,17 @@ layout_mode = 2
 text = "Enter a name:"
 horizontal_alignment = 1
 
-[node name="EnterName" type="LineEdit" parent="NetworkContainer/SettingsContainer"]
+[node name="NameCon" type="HBoxContainer" parent="NetworkContainer/SettingsContainer"]
 layout_mode = 2
+
+[node name="EnterName" type="LineEdit" parent="NetworkContainer/SettingsContainer/NameCon"]
+layout_mode = 2
+size_flags_horizontal = 3
 placeholder_text = "Name"
 
-[node name="SettingsApplyButton" type="Button" parent="NetworkContainer/SettingsContainer"]
+[node name="SettingsApplyButton" type="Button" parent="NetworkContainer/SettingsContainer/NameCon"]
 layout_mode = 2
-text = "Apply"
+text = "Enter"
 
 [node name="LobbyContainer" type="VBoxContainer" parent="NetworkContainer"]
 visible = false
@@ -106,11 +110,6 @@ horizontal_alignment = 1
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="DebugB" type="Button" parent="."]
-offset_right = 8.0
-offset_bottom = 8.0
-text = "DebugB"
-
 [node name="ClaimUI" type="VBoxContainer" parent="."]
 offset_left = 170.0
 offset_top = 1036.0
@@ -169,11 +168,6 @@ horizontal_alignment = 1
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Button" type="Button" parent="."]
-offset_right = 8.0
-offset_bottom = 8.0
-text = "Next round"
-
 [node name="Results" type="VBoxContainer" parent="."]
 visible = false
 custom_minimum_size = Vector2(150, 0)
@@ -201,10 +195,8 @@ layout_mode = 2
 text = "Restart"
 
 [connection signal="pressed" from="NetworkContainer/Join" to="." method="_on_join_pressed"]
-[connection signal="pressed" from="NetworkContainer/SettingsContainer/SettingsApplyButton" to="." method="_on_settings_apply_button_pressed"]
+[connection signal="pressed" from="NetworkContainer/SettingsContainer/NameCon/SettingsApplyButton" to="." method="_on_settings_apply_button_pressed"]
 [connection signal="pressed" from="NetworkContainer/LobbyContainer/StartButton" to="." method="_on_start_button_pressed"]
 [connection signal="pressed" from="Host" to="." method="_start_server"]
-[connection signal="pressed" from="DebugB" to="." method="foo"]
 [connection signal="pressed" from="ClaimUI/Button" to="." method="_on_button_pressed"]
-[connection signal="pressed" from="Button" to="." method="_next_round"]
 [connection signal="pressed" from="Results/RestartButton" to="." method="_on_restart_button_pressed"]
