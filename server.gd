@@ -17,6 +17,8 @@ var _round: int
 var _hand
 var _cut_this_round: int
 var _defuse_wire_cut: int
+var _new_global_card = Dictionary()
+var _already_cut: bool
 # UI Elements
 @onready
 var _ui_playerlist = $NetworkContainer/LobbyContainer/PlayerList
@@ -154,6 +156,7 @@ func _on_start_button_pressed() -> void:
 @rpc("authority")
 func _client_start_game(role):
 	_round = 4
+	$MyWireBox.show()
 	$PlayerGrid.show()
 	$Results.hide()
 	$NetworkContainer.hide()
@@ -200,6 +203,14 @@ func set_cards(ids):
 	return card_pool
 
 @rpc("authority")
+func new_deal_cards_client(new_global_cards):
+	_already_cut = false
+	var my_id = multiplayer.get_unique_id()
+	_new_global_card = new_global_cards
+	var new_wires = new_global_cards["in_play"][my_id]
+	$MyWireBox.set_my_box(my_id, new_wires)
+
+@rpc("authority")
 func deal_cards_client(wires):
 	# show cut button
 	for card in _player_cards.values():
@@ -208,23 +219,47 @@ func deal_cards_client(wires):
 	$HandCon/Hand.clear()
 	# set given cards
 	_hand = wires
+	#var new_wires = []
 	for wire_i in _hand:
+		var wire_dic = Dictionary()
+		wire_dic["type"] = wire_i
+		#new_wires.append(wire_dic)
 		$HandCon/Hand.add_item(wire_i)
+	#$MyWireBox.set_my_box(new_wires)
 	# update uncut count
 	for p_card in _player_cards.values():
 		wires.shuffle()
 		p_card.init_wire_box(wires)
 	#print(_hand)
 
-func deal_cards_sever(round_i):
+func shuffle_wires():
+	var all_cards = []
+	for id in _players.keys():
+		for wire in _new_global_card["in_play"][id]:
+			if not wire["is_cut"]:
+				all_cards.append(wire["type"])
+	all_cards.shuffle()
+	return	all_cards
+
+func deal_cards_server(round_i):
 	_cards["pool"].shuffle()
+	if _new_global_card["in_play"].size() != 0:
+		_cards["pool"] = shuffle_wires()
+	print(_cards["pool"])
 	for id in _players.keys():
 		var hand = []
+		var new_hand = []
 		for i in range(round_i + 1):
 			var card_i = _cards["pool"].pop_front()
 			hand.append(card_i)
+			new_hand.append(Dictionary({"type": card_i,
+										"id": i,
+										"is_cut": false}))
 		_cards["in_play"][id] = hand
-		rpc_id(id, "deal_cards_client", hand)
+		_new_global_card["in_play"][id] = new_hand
+		#rpc_id(id, "deal_cards_client", hand)
+	for id in _players.keys():
+		rpc_id(id, "new_deal_cards_client", _new_global_card)
 
 @rpc("any_peer")
 func _set_player_grid_server():
@@ -253,12 +288,12 @@ func _next_round():
 	for cards in _cards["in_play"].values():
 		_cards["pool"].append_array(cards)
 	_cards["in_play"] = Dictionary()
-	deal_cards_sever(_round)
+	deal_cards_server(_round)
 
 
 @rpc("any_peer")
 func _server_start_game():
-
+	_new_global_card["in_play"] = Dictionary()
 	#_set_player_grid(_players)
 	# set roles
 	_round = 4
@@ -277,7 +312,7 @@ func _server_start_game():
 			_cards["grave"][i][id] = []
 	#print(_cards["pool"])
 	# deal first hand
-	deal_cards_sever(_round)
+	deal_cards_server(_round)
 
 @rpc("any_peer")
 func pick_player(id):
@@ -329,7 +364,9 @@ func cut_wire_on_client(picked_wire, picked_from_id):
 	update_history(msg)
 	rpc("update_history", msg)
 
+@rpc("any_peer")
 func check_end_game(picked_wire):
+	print("cut ", picked_wire)
 	if picked_wire == "bomb":
 		bomb_explodes()
 	if picked_wire == "defuse_wire":
@@ -409,6 +446,37 @@ func set_uncut_wire_count(picked_id, wire_hand, wire_id):
 	var p_card = _player_cards[picked_id]
 	p_card.set_wire_box(wire_hand, wire_id)
 
+@rpc
+func show_new_wire_box(their_id):
+
+	$OthersWireBox.set_wires(their_id, _new_global_card["in_play"][their_id], _already_cut)
+	$OthersWireBox.update_wires(_new_global_card["in_play"][their_id])
+	$OthersWireBox.show()
+
+@rpc("any_peer")
+func update_global_card_after_cut(player_id, wire_data):
+	_new_global_card["in_play"][player_id] = wire_data
+	#for wire in old_wires:
+		#if wire["id"] == wire_id:
+			#wire["is_cut"] = true
+	# update other wire box
+	if $OthersWireBox.cur_player_id == player_id:
+		$OthersWireBox.set_wires(player_id, wire_data, _already_cut)
+
+@rpc("any_peer")
+func update_server_global_card(player_id, wire_data):
+	_new_global_card["in_play"][player_id] = wire_data
+
+func client_wire_box_cut(cur_player_id, wire_data, wire_type):
+	_already_cut = true
+	for id in _players.keys():
+		if id != multiplayer.get_unique_id():
+			rpc_id(id, "update_global_card_after_cut", cur_player_id, wire_data)
+	update_global_card_after_cut(cur_player_id, wire_data)
+	rpc_id(1, "update_server_global_card",cur_player_id, wire_data)
+	rpc_id(1, "check_end_game", wire_type)
+	#print(wire_data)
+	#print(cur_player_id, wire_type, wire_data)
 
 func _on_restart_button_pressed() -> void:
 	rpc_id(1, "_server_start_game")

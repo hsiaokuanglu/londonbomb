@@ -10,6 +10,14 @@
 animations = [{
 "frames": [{
 "duration": 1.0,
+"texture": ExtResource("1_qing3")
+}],
+"loop": true,
+"name": &"bomb",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": ExtResource("1_kbob1")
 }],
 "loop": true,
@@ -50,6 +58,7 @@ script = ExtResource("1_6uk88")
 
 [node name="Sprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_0ip56")
+animation = &"bomb"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0.5, 0)

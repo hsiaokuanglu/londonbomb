@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://diiyoithpg5hk"]
+[gd_scene load_steps=4 format=3 uid="uid://diiyoithpg5hk"]
 
 [ext_resource type="Script" path="res://server.gd" id="1_0h5vn"]
 [ext_resource type="Script" path="res://menu_button.gd" id="2_r6ymf"]
+[ext_resource type="PackedScene" uid="uid://cvswvndtcipjd" path="res://wire_box.tscn" id="3_75c7u"]
 
 [node name="Server" type="Node"]
 script = ExtResource("1_0h5vn")
@@ -194,9 +195,17 @@ custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "Restart"
 
+[node name="MyWireBox" parent="." instance=ExtResource("3_75c7u")]
+visible = false
+position = Vector2(82, 1115)
+
+[node name="OthersWireBox" parent="." instance=ExtResource("3_75c7u")]
+visible = false
+
 [connection signal="pressed" from="NetworkContainer/Join" to="." method="_on_join_pressed"]
 [connection signal="pressed" from="NetworkContainer/SettingsContainer/NameCon/SettingsApplyButton" to="." method="_on_settings_apply_button_pressed"]
 [connection signal="pressed" from="NetworkContainer/LobbyContainer/StartButton" to="." method="_on_start_button_pressed"]
 [connection signal="pressed" from="Host" to="." method="_start_server"]
 [connection signal="pressed" from="ClaimUI/Button" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="Results/RestartButton" to="." method="_on_restart_button_pressed"]
+[connection signal="wire_box_cut" from="OthersWireBox" to="." method="client_wire_box_cut"]

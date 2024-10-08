@@ -96,10 +96,8 @@ func set_wire_box(_wires, picked_wire_id):
 		
 
 func _on_button_pressed() -> void:
-	$WireBoxCon.show()
-	#$WireBoxCon.position = Vector2(get_viewport().size.x / 2 - $WireBoxCon.position.x /2 - self.position.x,
-									#get_viewport().size.y / 2- $WireBoxCon.position.y /2 - self.position.y)
-	#$WireBoxCon.position = Vector2.ZERO
+	client_scene.show_new_wire_box(player_id)
+
 
 func _hide_cut_button():
 	$VBoxContainer/CutButton.hide()
@@ -113,6 +111,7 @@ func _on_wire_wire_cut(wire_type, wire_id) -> void:
 	client_scene.cut_wire_player(player_id, wire_type, wire_id)
 	for wire in wire_scenes:
 		wire.cuttable = false
+
 
 
 func _on_exit_pressed() -> void:
