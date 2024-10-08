@@ -212,7 +212,8 @@ func deal_cards_client(wires):
 		$HandCon/Hand.add_item(wire_i)
 	# update uncut count
 	for p_card in _player_cards.values():
-		p_card.set_uncut_wire_count(wires.size())
+		wires.shuffle()
+		p_card.init_wire_box(wires)
 	#print(_hand)
 
 func deal_cards_sever(round_i):
@@ -269,7 +270,11 @@ func _server_start_game():
 	# set cards
 	_cards["in_play"] = Dictionary()
 	_cards["pool"] = set_cards(_players.keys())
-	_cards["grave"] = []
+	_cards["grave"] = Dictionary()
+	for i in range(4,0,-1):
+		_cards["grave"][i] = Dictionary()
+		for id in _players.keys():
+			_cards["grave"][i][id] = []
 	#print(_cards["pool"])
 	# deal first hand
 	deal_cards_sever(_round)
@@ -281,6 +286,29 @@ func pick_player(id):
 	if id == multiplayer.get_unique_id():
 		print("i got picked by ", sender_id)
 		rpc_id(1, "cut_wire_from_server", sender_id, id)
+
+# call from the player that cut
+func cut_wire_player(selected_id, picked_wire, wire_id):
+	var my_id = multiplayer.get_unique_id()
+	rpc_id(1, "cut_wire_already_selected", my_id, selected_id, picked_wire, wire_id)
+	rpc_id(selected_id, "got_cut", wire_id)
+
+@rpc("any_peer")
+func got_cut(wire_id):
+	#print(_cards["in_play"][multiplayer.get_unique_id()])
+	
+	print($HandCon/Hand.get_item_text(wire_id))
+	$HandCon/Hand.remove_item(wire_id)
+
+# run in server
+@rpc("any_peer")
+func cut_wire_already_selected(picking_id, picked_id, picked_wire, wire_id):
+	var picked_hand = _cards["in_play"][picked_id]
+	picked_hand.erase(picked_wire)
+	_cards["grave"][_round][picked_id].append(picked_wire)
+	rpc_id(picking_id, "cut_wire_on_client", picked_wire, picked_id)
+	rpc("set_uncut_wire_count", picked_id, picked_hand, wire_id)
+	check_end_game(picked_wire)
 
 @rpc("any_peer")
 func update_history(message):
@@ -301,15 +329,7 @@ func cut_wire_on_client(picked_wire, picked_from_id):
 	update_history(msg)
 	rpc("update_history", msg)
 
-
-@rpc("any_peer")
-func cut_wire_from_server(picking_id, picked_id):
-	var picked_hand = _cards["in_play"][picked_id]
-	picked_hand.shuffle()
-	var picked_wire = picked_hand.pop_front()
-	_cards["grave"].append(picked_wire)
-	rpc_id(picking_id, "cut_wire_on_client", picked_wire, picked_id)
-	rpc("set_uncut_wire_count", picked_id, picked_hand.size())
+func check_end_game(picked_wire):
 	if picked_wire == "bomb":
 		bomb_explodes()
 	if picked_wire == "defuse_wire":
@@ -324,6 +344,16 @@ func cut_wire_from_server(picking_id, picked_id):
 		t.timeout.connect(next_round_timeout)
 		add_child(t)
 		t.start()
+
+@rpc("any_peer")
+func cut_wire_from_server(picking_id, picked_id):
+	var picked_hand = _cards["in_play"][picked_id]
+	picked_hand.shuffle()
+	var picked_wire = picked_hand.pop_front()
+	_cards["grave"].append(picked_wire)
+	rpc_id(picking_id, "cut_wire_on_client", picked_wire, picked_id)
+	rpc("set_uncut_wire_count", picked_id, picked_hand.size())
+	check_end_game(picked_wire)
 		#_next_round()
 	#print(picked_hand)
 	#print(picked_wire)
@@ -373,11 +403,11 @@ func set_claim(claim):
 	p_card.set_claim(claim)
 
 @rpc("any_peer")
-func set_uncut_wire_count(picked_id, wire_count):
+func set_uncut_wire_count(picked_id, wire_hand, wire_id):
 	if multiplayer.get_unique_id() == 1 or multiplayer.get_unique_id() == picked_id:
 		return
 	var p_card = _player_cards[picked_id]
-	p_card.set_uncut_wire_count(wire_count)
+	p_card.set_wire_box(wire_hand, wire_id)
 
 
 func _on_restart_button_pressed() -> void:

@@ -1,9 +1,21 @@
-[gd_scene load_steps=3 format=3 uid="uid://ducya1mvo5mu4"]
+[gd_scene load_steps=8 format=3 uid="uid://ducya1mvo5mu4"]
 
+[ext_resource type="Script" path="res://wire.gd" id="1_6uk88"]
+[ext_resource type="Texture2D" uid="uid://b2u33jcfywf6o" path="res://art/wire_cut.png" id="1_kbob1"]
 [ext_resource type="Texture2D" uid="uid://dhoc1o3aqmlbx" path="res://art/wire.png" id="1_qing3"]
+[ext_resource type="Texture2D" uid="uid://k0yp3koodvo8" path="res://art/wire_defuse.png" id="4_rlhly"]
+[ext_resource type="Texture2D" uid="uid://bbmlsrqor6gpf" path="res://art/wire_safe.png" id="5_p0465"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_0ip56"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_kbob1")
+}],
+"loop": true,
+"name": &"cut",
+"speed": 5.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": ExtResource("1_qing3")
@@ -11,7 +23,36 @@ animations = [{
 "loop": true,
 "name": &"default",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_rlhly")
+}],
+"loop": true,
+"name": &"defuse_wire",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_p0465")
+}],
+"loop": true,
+"name": &"safe_wire",
+"speed": 5.0
 }]
 
-[node name="Wire" type="AnimatedSprite2D"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_yxkrm"]
+size = Vector2(501, 20)
+
+[node name="Area2D" type="Area2D"]
+scale = Vector2(0.5, 0.5)
+script = ExtResource("1_6uk88")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_0ip56")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0.5, 0)
+shape = SubResource("RectangleShape2D_yxkrm")
+
+[connection signal="input_event" from="." to="." method="_on_wire_input_event"]

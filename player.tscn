@@ -1,15 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://b4wn65tr8mhar"]
+[gd_scene load_steps=3 format=3 uid="uid://b4wn65tr8mhar"]
 
 [ext_resource type="Script" path="res://player.gd" id="1_dhqp6"]
-[ext_resource type="Texture2D" uid="uid://m2m6ia77vijc" path="res://art/box.png" id="2_acv0k"]
 [ext_resource type="Script" path="res://wire_box_con.gd" id="2_vdjki"]
-[ext_resource type="PackedScene" uid="uid://ducya1mvo5mu4" path="res://wire.tscn" id="3_e1hl7"]
-[ext_resource type="PackedScene" uid="uid://rqx8dxsq1ye0" path="res://cutter.tscn" id="4_bkkun"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_w5q87"]
-size = Vector2(297, 300)
 
 [node name="Player" type="Control"]
+custom_minimum_size = Vector2(210, 150)
 layout_mode = 3
 anchors_preset = 0
 offset_right = 210.0
@@ -66,38 +61,36 @@ text = "0"
 layout_mode = 2
 text = "Cut!"
 
-[node name="WireBoxCon" type="Control" parent="."]
-layout_mode = 1
-anchors_preset = 0
-offset_left = 406.0
-offset_top = 131.0
-offset_right = 446.0
-offset_bottom = 171.0
+[node name="WireBoxCon" type="Node2D" parent="."]
+position = Vector2(300, 300)
 script = ExtResource("2_vdjki")
 
-[node name="Area2D" type="Area2D" parent="WireBoxCon"]
+[node name="Wires" type="Node2D" parent="WireBoxCon"]
 
-[node name="Sprite2D" type="Sprite2D" parent="WireBoxCon/Area2D"]
-position = Vector2(27.5, 22.5)
-scale = Vector2(2.97, 2.99)
-texture = ExtResource("2_acv0k")
+[node name="Exit" type="Button" parent="WireBoxCon"]
+offset_right = 61.0
+offset_bottom = 50.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 30
+text = "Exit
+"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WireBoxCon/Area2D"]
-position = Vector2(28.5, 22)
-shape = SubResource("RectangleShape2D_w5q87")
-
-[node name="Wire" parent="WireBoxCon" instance=ExtResource("3_e1hl7")]
-position = Vector2(30, -13)
-scale = Vector2(0.639999, 0.48)
-
-[node name="Cutter" parent="WireBoxCon" instance=ExtResource("4_bkkun")]
-scale = Vector2(0.5, 0.5)
-
-[node name="Label" type="Label" parent="WireBoxCon"]
+[node name="Button" type="Button" parent="."]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 23.0
+offset_left = 220.0
+offset_top = 9.0
+offset_right = 318.0
+offset_bottom = 40.0
+text = "Test button"
+
+[node name="Button2" type="Button" parent="."]
+layout_mode = 0
+offset_left = 366.0
+offset_right = 438.0
+offset_bottom = 31.0
+text = "Debug 2"
 
 [connection signal="pressed" from="VBoxContainer/CutButton" to="." method="_on_button_pressed"]
-[connection signal="mouse_entered" from="WireBoxCon/Area2D" to="WireBoxCon" method="_on_area_2d_mouse_entered"]
-[connection signal="mouse_exited" from="WireBoxCon/Area2D" to="WireBoxCon" method="_on_area_2d_mouse_exited"]
+[connection signal="pressed" from="WireBoxCon/Exit" to="." method="_on_exit_pressed"]
+[connection signal="pressed" from="Button" to="." method="debug_button"]
+[connection signal="pressed" from="Button2" to="." method="_on_button_2_pressed"]
