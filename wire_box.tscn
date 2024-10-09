@@ -1,7 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://cvswvndtcipjd"]
+[gd_scene load_steps=6 format=3 uid="uid://cvswvndtcipjd"]
 
 [ext_resource type="Script" path="res://wire_box.gd" id="1_tf6at"]
 [ext_resource type="Texture2D" uid="uid://m2m6ia77vijc" path="res://art/box.png" id="2_wxwxl"]
+[ext_resource type="PackedScene" uid="uid://ducya1mvo5mu4" path="res://wire.tscn" id="3_6a3ft"]
+[ext_resource type="Theme" uid="uid://dss4hlpng3bfh" path="res://theme/default.tres" id="4_l6hjn"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_vdmcb"]
 animations = [{
@@ -28,10 +30,16 @@ script = ExtResource("1_tf6at")
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(-1, 0)
+scale = Vector2(5, 8)
 sprite_frames = SubResource("SpriteFrames_vdmcb")
 animation = &"my_box"
 
 [node name="Wires" type="Node2D" parent="."]
+
+[node name="Area2D" parent="Wires" instance=ExtResource("3_6a3ft")]
+
+[node name="Area2D2" parent="Wires" instance=ExtResource("3_6a3ft")]
+position = Vector2(2, 113)
 
 [node name="Button" type="Button" parent="."]
 visible = false
@@ -41,19 +49,27 @@ offset_right = 2.0
 offset_bottom = -145.0
 text = "set wire"
 
+[node name="ExitButton" type="Button" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -36.0
+offset_top = 325.0
+offset_right = 43.0
+offset_bottom = 388.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("4_l6hjn")
+text = "Exit"
+
 [node name="Button2" type="Button" parent="."]
 visible = false
 offset_right = 8.0
 offset_bottom = 8.0
 text = "update wire"
 
-[node name="ExitButton" type="Button" parent="."]
-offset_left = -20.0
-offset_top = 68.0
-offset_right = 17.0
-offset_bottom = 99.0
-text = "Exit"
-
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
-[connection signal="pressed" from="Button2" to="." method="_on_button_2_pressed"]
 [connection signal="pressed" from="ExitButton" to="." method="_on_exit_button_pressed"]
+[connection signal="pressed" from="Button2" to="." method="_on_button_2_pressed"]

@@ -5,7 +5,8 @@ var key_path = "res://ssl/selfsigned.key"
 var cert_path = "res://ssl/selfsigned.crt"
 var port = 8765
 #var url = "wss://luraykuang1998.online:80"
-var debug = true 
+#var debug = false
+var debug = true
 var url = "ws://localhost:8765" # change TLSOptions.client()
 #var connected_peer_ids = []
 var local_player_character
@@ -19,6 +20,8 @@ var _cut_this_round: int
 var _defuse_wire_cut: int
 var _new_global_card = Dictionary()
 var _already_cut: bool
+var _i_have_bomb: bool
+var _showing_declare: bool
 # UI Elements
 @onready
 var _ui_playerlist = $NetworkContainer/LobbyContainer/PlayerList
@@ -105,12 +108,12 @@ func _on_connection_established():
 
 	_ui_settings_container.show()
 	$NetworkContainer/LobbyContainer.show()
-	$Label.text = "Connected to server"
+	$NetworkContainer/Label.text = "Connected to server"
 
 
 func _on_connection_error():
 	print("Connection error")
-	$Label.text = "Connection error"
+	$NetworkContainer/Label.text = "Connection error"
 
 @rpc
 func _add_previously_connected_player_names(p_id_names: Dictionary):
@@ -156,8 +159,9 @@ func _on_start_button_pressed() -> void:
 @rpc("authority")
 func _client_start_game(role):
 	_round = 4
+	_i_have_bomb = false
 	$MyWireBox.show()
-	$PlayerGrid.show()
+	$ScrollContainer.show()
 	$Results.hide()
 	$NetworkContainer.hide()
 	$RoleLabel.text = role
@@ -208,7 +212,10 @@ func new_deal_cards_client(new_global_cards):
 	var my_id = multiplayer.get_unique_id()
 	_new_global_card = new_global_cards
 	var new_wires = new_global_cards["in_play"][my_id]
+	for p_scene in _player_cards.values():
+		p_scene.update_uncut_wire_count(new_wires.size())
 	$MyWireBox.set_my_box(my_id, new_wires)
+	$DeclareWindow._set_spinbox_max(new_wires.size())
 
 @rpc("authority")
 func deal_cards_client(wires):
@@ -270,17 +277,32 @@ func _set_player_grid_server():
 
 @rpc("authority")
 func _set_player_grid(players):
-	$PlayerGrid.show()
+	$ScrollContainer.show()
 	for id in players.keys():
 		if id != multiplayer.get_unique_id():
 			var player_scene = preload("res://player.tscn").instantiate()
 			player_scene.set_multiplayer_authority(id)
 			player_scene.set_info(players[id])
 			player_scene.set_data(id, self)
-			$PlayerGrid.add_child(player_scene)
+			$ScrollContainer/PlayerGrid.add_child(player_scene)
 			_player_cards[id] = player_scene
 
+@rpc("authority")
+func _next_round_client():
+	_i_have_bomb = false
+	$ClaimUI/HaveBombButton.text = "No Bomb"
+	#$WireBoxWindow.hide()
+	$OthersWireBox.hide()
+	for p_scene in _player_cards.values():
+		p_scene.show()
+	for id in _players.keys():
+		if id != multiplayer.get_unique_id():
+			update_player_scene_have_bomb(id, false)
+
+# server
 func _next_round():
+	for id in _players.keys():
+		rpc_id(id, "_next_round_client")
 	if _round == 1:
 		bomb_explodes()
 	_round -= 1
@@ -418,21 +440,41 @@ func bomb_explodes():
 
 @rpc
 func end_game_client(win):
-	$PlayerGrid.hide()
+	$ScrollContainer.hide()
 	if win:
 		$Results/Label.text = "WIN!"
 	else:
 		$Results/Label.text = "LOSE!"
 	$Results.show()
 
-#debug
+
+# set claim
 func _on_button_pressed() -> void:
-#debug
 	var claim = Dictionary({"bomb": _ui_claim.get_node("BombContainer/MenuButton").text,
 							"defuse_wire": _ui_claim.get_node("DefuseWireContainer/MenuButton").text})
 	for id in _players.keys():
 		if id != multiplayer.get_unique_id():
 			rpc_id(id, "set_claim", claim)
+
+
+func _on_declare_window_spinbox_value_change(value) -> void:
+	for id in _players.keys():
+		if id != multiplayer.get_unique_id():
+			rpc_id(id, "set_defuse_claim", value)
+
+@rpc("any_peer")
+func set_defuse_claim(value):
+	var p_card = _player_cards[multiplayer.get_remote_sender_id()]
+	p_card.set_defuse_wire_count(value)
+
+func _on_declare_button_pressed():
+	if not _showing_declare:
+		$DeclareWindow.show()
+		_showing_declare = true
+	else:
+		$DeclareWindow.hide()
+		_showing_declare = false
+	
 
 @rpc("any_peer")
 func set_claim(claim):
@@ -452,16 +494,28 @@ func show_new_wire_box(their_id):
 	$OthersWireBox.set_wires(their_id, _new_global_card["in_play"][their_id], _already_cut)
 	$OthersWireBox.update_wires(_new_global_card["in_play"][their_id])
 	$OthersWireBox.show()
+	for p_scene in _player_cards.values():
+		p_scene.hide()
 
 @rpc("any_peer")
 func update_global_card_after_cut(player_id, wire_data):
 	_new_global_card["in_play"][player_id] = wire_data
-	#for wire in old_wires:
-		#if wire["id"] == wire_id:
-			#wire["is_cut"] = true
-	# update other wire box
+	
+	# update player_card uncut wire count:
+	if player_id != multiplayer.get_unique_id():
+		var w_count = 0
+		for wire in wire_data:
+			if not wire["is_cut"]:
+				w_count +=1
+		var p_card = _player_cards[player_id]
+		p_card.update_uncut_wire_count(w_count)
+
 	if $OthersWireBox.cur_player_id == player_id:
 		$OthersWireBox.set_wires(player_id, wire_data, _already_cut)
+
+func update_player_scene_uncut_wire_count():
+	pass
+	
 
 @rpc("any_peer")
 func update_server_global_card(player_id, wire_data):
@@ -481,3 +535,30 @@ func client_wire_box_cut(cur_player_id, wire_data, wire_type):
 func _on_restart_button_pressed() -> void:
 	rpc_id(1, "_server_start_game")
 	$Results.hide()
+
+@rpc("any_peer")
+func update_player_scene_have_bomb(their_id, they_have_bomb: bool):
+	var p_scene = _player_cards[their_id]
+	p_scene.update_have_bomb(they_have_bomb)
+
+func _on_have_bomb_button_pressed() -> void:
+	if _i_have_bomb:
+		_i_have_bomb = false
+		$ClaimUI/HaveBombButton.text = "No Bomb"
+	else:
+		_i_have_bomb = true
+		$ClaimUI/HaveBombButton.text = "I Have Bomb"
+
+	for id in _players.keys():
+		if id != multiplayer.get_unique_id():
+			rpc_id(id, "update_player_scene_have_bomb", multiplayer.get_unique_id(), _i_have_bomb)
+		
+
+
+func _on_wire_box_exit_button_pressed() -> void:
+	$OthersWireBox.hide()
+
+
+func _on_others_wire_box_hide_wire_box() -> void:
+	for p_scene in _player_cards.values():
+		p_scene.show()

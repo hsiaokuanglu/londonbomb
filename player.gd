@@ -14,7 +14,15 @@ func _ready():
 	$WireBoxCon.hide()
 	#$WireBoxCon/Exit.position = Vector2(client_scene.position().x,
 										#client_scene.position().y)
-	
+
+func update_have_bomb(have_bomb:bool):
+	if have_bomb:
+		$VBoxContainer/ClaimUI/BombCon/HaveBomb.text = "I Have Bomb"
+	else:
+		$VBoxContainer/ClaimUI/BombCon/HaveBomb.text = "No Bomb"
+
+func update_uncut_wire_count(count):
+	$VBoxContainer/WireNumCon/Count.text = str(count)
 
 func set_data(id, c_scene):
 	player_id = id
@@ -25,6 +33,8 @@ func set_data(id, c_scene):
 func set_info(p_name):
 	$VBoxContainer/Name.text = p_name
 
+func set_defuse_wire_count(value):
+	$VBoxContainer/ClaimUI/DWireCon/Count.text = str(value)
 
 func set_claim(claim_info: Dictionary):
 	#print(claim_info)

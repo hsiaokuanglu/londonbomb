@@ -7,6 +7,7 @@ var cur_player_id:int
 var cur_wire_data
 var _already_cut: bool
 signal wire_box_cut
+signal hide_wire_box
 # Called when the node enters the scene tree for the first time.
 #func _ready() -> void:
 	#for ch_i in $Wires.get_children():
@@ -67,6 +68,7 @@ func update_wires(wires):
 			wire_scene.play_cut()
 
 func set_my_box(player_id, wires):
+	$Sprite2D.hide()
 	$ExitButton.hide()
 	wire_box_height = 50
 	wire_gap = 25
@@ -116,3 +118,4 @@ func get_wire_data():
 
 func _on_exit_button_pressed() -> void:
 	hide()
+	hide_wire_box.emit()

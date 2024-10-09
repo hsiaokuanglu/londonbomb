@@ -1,0 +1,9 @@
+[gd_resource type="Theme" format=3 uid="uid://dss4hlpng3bfh"]
+
+[resource]
+Button/font_sizes/font_size = 40
+ItemList/font_sizes/font_size = 25
+Label/font_sizes/font_size = 40
+Label/fonts/font = null
+LineEdit/font_sizes/font_size = 30
+PopupMenu/font_sizes/font_size = 25

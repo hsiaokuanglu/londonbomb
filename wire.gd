@@ -7,6 +7,7 @@ var wire_id: int
 var is_cut := false
 signal wire_cut
 
+
 func _on_wire_input_event(viewport: Node, event: InputEvent, shape_idx: int) -> void:
 	if mouse_down and cuttable:
 		is_cut = true
@@ -39,3 +40,11 @@ func play_cut():
 		$Sprite.play("safe_wire")
 	else:
 		$Sprite.play("cut")
+
+
+func _on_button_pressed() -> void:
+	$Sprite.play("safe_wire_cut")
+
+
+func _on_mouse_entered() -> void:
+	print("mouse entered")

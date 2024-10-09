@@ -1,23 +1,38 @@
-[gd_scene load_steps=4 format=3 uid="uid://diiyoithpg5hk"]
+[gd_scene load_steps=7 format=3 uid="uid://diiyoithpg5hk"]
 
 [ext_resource type="Script" path="res://server.gd" id="1_0h5vn"]
+[ext_resource type="Texture2D" uid="uid://m2m6ia77vijc" path="res://art/box.png" id="2_a24hj"]
 [ext_resource type="Script" path="res://menu_button.gd" id="2_r6ymf"]
+[ext_resource type="Theme" uid="uid://dss4hlpng3bfh" path="res://theme/default.tres" id="2_rryri"]
 [ext_resource type="PackedScene" uid="uid://cvswvndtcipjd" path="res://wire_box.tscn" id="3_75c7u"]
+[ext_resource type="PackedScene" uid="uid://bk15ap3u2cei8" path="res://declare_window.tscn" id="5_1ko3c"]
 
 [node name="Server" type="Node"]
 script = ExtResource("1_0h5vn")
 
+[node name="DeclareWindow" parent="." instance=ExtResource("5_1ko3c")]
+visible = false
+
 [node name="NetworkContainer" type="VBoxContainer" parent="."]
-offset_left = 198.0
-offset_top = 145.0
-offset_right = 411.0
-offset_bottom = 610.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -400.0
+offset_right = 250.0
+offset_bottom = 400.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("2_rryri")
 
 [node name="Join" type="Button" parent="NetworkContainer"]
 custom_minimum_size = Vector2(160, 80)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 20
 text = "Join"
 
 [node name="SettingsContainer" type="VBoxContainer" parent="NetworkContainer"]
@@ -59,20 +74,20 @@ item_count = 2
 [node name="StartButton" type="Button" parent="NetworkContainer/LobbyContainer"]
 custom_minimum_size = Vector2(100, 50)
 layout_mode = 2
-size_flags_horizontal = 4
 text = "Start"
 
-[node name="Label" type="Label" parent="."]
-offset_left = 83.0
-offset_top = 12.0
-offset_right = 123.0
-offset_bottom = 35.0
+[node name="Label" type="Label" parent="NetworkContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
 
 [node name="Host" type="Button" parent="."]
-offset_left = 424.0
-offset_top = -1.0
-offset_right = 593.0
-offset_bottom = 77.0
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -169.0
+offset_bottom = 78.0
+grow_horizontal = 0
+size_flags_horizontal = 8
 text = "Host (Debug)"
 
 [node name="RoleLabel" type="Label" parent="."]
@@ -84,15 +99,23 @@ offset_right = 51.5
 offset_bottom = 34.0
 grow_horizontal = 2
 
-[node name="PlayerGrid" type="HFlowContainer" parent="."]
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
 visible = false
-custom_minimum_size = Vector2(500, 800)
-offset_left = 50.0
-offset_top = 100.0
-offset_right = 550.0
-offset_bottom = 900.0
+anchors_preset = -1
+anchor_left = 0.05
+anchor_top = 0.1
+anchor_right = 0.95
+anchor_bottom = 0.8
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PlayerGrid" type="GridContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_stretch_ratio = 0.0
+columns = 2
 
 [node name="HandCon" type="VBoxContainer" parent="."]
+visible = false
 offset_left = 3.00002
 offset_top = 998.0
 offset_right = 202.0
@@ -112,13 +135,21 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="ClaimUI" type="VBoxContainer" parent="."]
-offset_left = 170.0
-offset_top = 1036.0
-offset_right = 291.0
-offset_bottom = 1137.0
-scale = Vector2(1.5, 1.5)
+custom_minimum_size = Vector2(300, 200)
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -201.0
+offset_top = -200.0
+offset_right = -1.0
+grow_horizontal = 0
+grow_vertical = 0
+theme = ExtResource("2_rryri")
 
 [node name="DefuseWireContainer" type="HBoxContainer" parent="ClaimUI"]
+visible = false
 layout_mode = 2
 alignment = 2
 
@@ -132,6 +163,7 @@ text = "0"
 script = ExtResource("2_r6ymf")
 
 [node name="BombContainer" type="HBoxContainer" parent="ClaimUI"]
+visible = false
 layout_mode = 2
 alignment = 2
 
@@ -148,7 +180,12 @@ script = ExtResource("2_r6ymf")
 layout_mode = 2
 text = "Declare!"
 
+[node name="HaveBombButton" type="Button" parent="ClaimUI"]
+layout_mode = 2
+text = "No Bomb"
+
 [node name="HistoryCon" type="VBoxContainer" parent="."]
+visible = false
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
@@ -177,10 +214,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -73.0
-offset_top = -61.0
-offset_right = 77.0
-offset_bottom = 62.0
+offset_left = -75.0
+offset_top = -61.5
+offset_right = 75.0
+offset_bottom = 61.5
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -195,17 +232,45 @@ custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 text = "Restart"
 
-[node name="MyWireBox" parent="." instance=ExtResource("3_75c7u")]
+[node name="WireBoxWindow" type="Window" parent="."]
+initial_position = 1
+size = Vector2i(300, 700)
 visible = false
-position = Vector2(82, 1115)
+borderless = true
+theme = ExtResource("2_rryri")
+
+[node name="background" type="Sprite2D" parent="WireBoxWindow"]
+scale = Vector2(6, 15)
+texture = ExtResource("2_a24hj")
+
+[node name="ExitButton" type="Button" parent="WireBoxWindow"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -39.5
+offset_top = -63.0
+offset_right = 39.5
+grow_horizontal = 2
+grow_vertical = 0
+text = "Exit"
 
 [node name="OthersWireBox" parent="." instance=ExtResource("3_75c7u")]
 visible = false
+position = Vector2(384, 690)
 
+[node name="MyWireBox" parent="." instance=ExtResource("3_75c7u")]
+position = Vector2(216, 1403)
+
+[connection signal="spinbox_value_change" from="DeclareWindow" to="." method="_on_declare_window_spinbox_value_change"]
 [connection signal="pressed" from="NetworkContainer/Join" to="." method="_on_join_pressed"]
 [connection signal="pressed" from="NetworkContainer/SettingsContainer/NameCon/SettingsApplyButton" to="." method="_on_settings_apply_button_pressed"]
 [connection signal="pressed" from="NetworkContainer/LobbyContainer/StartButton" to="." method="_on_start_button_pressed"]
 [connection signal="pressed" from="Host" to="." method="_start_server"]
-[connection signal="pressed" from="ClaimUI/Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="ClaimUI/Button" to="." method="_on_declare_button_pressed"]
+[connection signal="pressed" from="ClaimUI/HaveBombButton" to="." method="_on_have_bomb_button_pressed"]
 [connection signal="pressed" from="Results/RestartButton" to="." method="_on_restart_button_pressed"]
+[connection signal="pressed" from="WireBoxWindow/ExitButton" to="." method="_on_wire_box_exit_button_pressed"]
+[connection signal="hide_wire_box" from="OthersWireBox" to="." method="_on_others_wire_box_hide_wire_box"]
 [connection signal="wire_box_cut" from="OthersWireBox" to="." method="client_wire_box_cut"]
