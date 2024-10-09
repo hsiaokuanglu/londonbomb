@@ -98,5 +98,4 @@ theme_override_font_sizes/font_size = 100
 text = "CUT"
 
 [connection signal="input_event" from="." to="." method="_on_wire_input_event"]
-[connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

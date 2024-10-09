@@ -158,13 +158,19 @@ func _on_start_button_pressed() -> void:
 
 @rpc("authority")
 func _client_start_game(role):
+	_defuse_wire_cut = 0
 	_round = 4
 	_i_have_bomb = false
+	$DefuseWireCon/Number.text = str(_round)
+	$RoundCon/CountdownNum.text = str(_round)
 	$MyWireBox.show()
 	$ScrollContainer.show()
 	$Results.hide()
 	$NetworkContainer.hide()
 	$RoleLabel.text = role
+	$RoundCon.show()
+	_ui_claim.show()
+	$OthersWireBox.set_player_names(_players)
 
 func set_roles(ids) -> Dictionary:
 	var rtn_role = Dictionary()
@@ -288,9 +294,14 @@ func _set_player_grid(players):
 			_player_cards[id] = player_scene
 
 @rpc("authority")
-func _next_round_client():
+func _next_round_client(round):
+	_round = round
 	_i_have_bomb = false
+	# TODO
+	$DeclareWindow.get_node("HBoxContainer/SpinBox").get_line_edit().set_text("0")
+	$DeclareWindow.get_node("HBoxContainer/SpinBox").apply()
 	$ClaimUI/HaveBombButton.text = "No Bomb"
+	$RoundCon/CountdownNum.text = str(round)
 	#$WireBoxWindow.hide()
 	$OthersWireBox.hide()
 	for p_scene in _player_cards.values():
@@ -301,16 +312,19 @@ func _next_round_client():
 
 # server
 func _next_round():
-	for id in _players.keys():
-		rpc_id(id, "_next_round_client")
+	
 	if _round == 1:
 		bomb_explodes()
 	_round -= 1
+	for id in _players.keys():
+		rpc_id(id, "_next_round_client", _round)
+	$RoundCon/CountdownNum.text = str(_round)
 	_cut_this_round = 0
 	for cards in _cards["in_play"].values():
 		_cards["pool"].append_array(cards)
 	_cards["in_play"] = Dictionary()
 	deal_cards_server(_round)
+	
 
 
 @rpc("any_peer")
@@ -391,10 +405,8 @@ func check_end_game(picked_wire):
 	print("cut ", picked_wire)
 	if picked_wire == "bomb":
 		bomb_explodes()
-	if picked_wire == "defuse_wire":
-		_defuse_wire_cut += 1
-		if _defuse_wire_cut == _players.keys().size():
-			bomb_defused()
+	if _defuse_wire_cut == _players.keys().size():
+		bomb_defused()
 	_cut_this_round += 1
 	if _cut_this_round == _players.keys().size():
 		var t = Timer.new()
@@ -441,6 +453,7 @@ func bomb_explodes():
 @rpc
 func end_game_client(win):
 	$ScrollContainer.hide()
+	$OthersWireBox.hide()
 	if win:
 		$Results/Label.text = "WIN!"
 	else:
@@ -498,7 +511,10 @@ func show_new_wire_box(their_id):
 		p_scene.hide()
 
 @rpc("any_peer")
-func update_global_card_after_cut(player_id, wire_data):
+func update_global_card_after_cut(player_id, wire_data, wire_type):
+	if wire_type == "defuse_wire":
+		_defuse_wire_cut += 1
+		$DefuseWireCon/Number.text = str(_players.keys().size() - _defuse_wire_cut)
 	_new_global_card["in_play"][player_id] = wire_data
 	
 	# update player_card uncut wire count:
@@ -518,17 +534,20 @@ func update_player_scene_uncut_wire_count():
 	
 
 @rpc("any_peer")
-func update_server_global_card(player_id, wire_data):
+func update_server_global_card(player_id, wire_data, wire_type):
+	if wire_type == "defuse_wire":
+		_defuse_wire_cut += 1
 	_new_global_card["in_play"][player_id] = wire_data
+	check_end_game(wire_type)
 
 func client_wire_box_cut(cur_player_id, wire_data, wire_type):
 	_already_cut = true
 	for id in _players.keys():
 		if id != multiplayer.get_unique_id():
-			rpc_id(id, "update_global_card_after_cut", cur_player_id, wire_data)
-	update_global_card_after_cut(cur_player_id, wire_data)
-	rpc_id(1, "update_server_global_card",cur_player_id, wire_data)
-	rpc_id(1, "check_end_game", wire_type)
+			rpc_id(id, "update_global_card_after_cut", cur_player_id, wire_data, wire_type)
+	update_global_card_after_cut(cur_player_id, wire_data, wire_type)
+	rpc_id(1, "update_server_global_card",cur_player_id, wire_data, wire_type)
+	#rpc_id(1, "check_end_game", wire_type)
 	#print(wire_data)
 	#print(cur_player_id, wire_type, wire_data)
 

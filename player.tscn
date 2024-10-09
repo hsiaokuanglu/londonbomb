@@ -23,30 +23,8 @@ layout_mode = 2
 text = "Name"
 horizontal_alignment = 1
 
-[node name="WireNumCon" type="HBoxContainer" parent="VBoxContainer"]
-layout_mode = 2
-
-[node name="WiresNum" type="Label" parent="VBoxContainer/WireNumCon"]
-layout_mode = 2
-text = "Uncut Wires:"
-
-[node name="Count" type="Label" parent="VBoxContainer/WireNumCon"]
-layout_mode = 2
-text = "0"
-
 [node name="ClaimUI" type="VBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
-
-[node name="DWireCon" type="HBoxContainer" parent="VBoxContainer/ClaimUI"]
-layout_mode = 2
-
-[node name="DWireLabel" type="Label" parent="VBoxContainer/ClaimUI/DWireCon"]
-layout_mode = 2
-text = "Defuse Wire:"
-
-[node name="Count" type="Label" parent="VBoxContainer/ClaimUI/DWireCon"]
-layout_mode = 2
-text = "0"
 
 [node name="BombCon" type="HBoxContainer" parent="VBoxContainer/ClaimUI"]
 layout_mode = 2
@@ -65,9 +43,35 @@ text = "0"
 layout_mode = 2
 text = "No Bomb"
 
+[node name="DWireCon" type="HBoxContainer" parent="VBoxContainer/ClaimUI"]
+layout_mode = 2
+
+[node name="DWireLabel" type="Label" parent="VBoxContainer/ClaimUI/DWireCon"]
+layout_mode = 2
+text = "Defuse Wires:"
+
+[node name="Count" type="Label" parent="VBoxContainer/ClaimUI/DWireCon"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+horizontal_alignment = 1
+
+[node name="WireNumCon" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="WiresNum" type="Label" parent="VBoxContainer/WireNumCon"]
+layout_mode = 2
+text = "Uncut Wires:"
+
+[node name="Count" type="Label" parent="VBoxContainer/WireNumCon"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+horizontal_alignment = 1
+
 [node name="CutButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
-text = "Cut!"
+text = "Check Wires"
 
 [node name="WireBoxCon" type="Node2D" parent="."]
 visible = false

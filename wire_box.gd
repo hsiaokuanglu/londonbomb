@@ -6,6 +6,7 @@ var wire_scenes = Dictionary()
 var cur_player_id:int
 var cur_wire_data
 var _already_cut: bool
+var player_id_names = Dictionary()
 signal wire_box_cut
 signal hide_wire_box
 # Called when the node enters the scene tree for the first time.
@@ -13,6 +14,10 @@ signal hide_wire_box
 	#for ch_i in $Wires.get_children():
 		#for ch_j in $Wires.get_children():
 			#ch_i.wire_cut.connect(ch_j._on_other_wire_cut)
+
+func set_player_names(id_names):
+	player_id_names = id_names
+	
 
 func connect_wire_cut_signal():
 	for ch_i in $Wires.get_children():
@@ -31,6 +36,8 @@ func _clear_wire_scenes():
 func set_wires(player_id, wires, _already_cut):
 	_clear_wire_scenes()
 	cur_player_id = player_id
+	if player_id in player_id_names:
+		$PlayerName.text = player_id_names[player_id]
 	cur_wire_data = wires
 	var pos_x = 0
 	var pos_y = - wire_box_height
@@ -73,6 +80,7 @@ func set_my_box(player_id, wires):
 	wire_box_height = 50
 	wire_gap = 25
 	$Sprite2D.play("my_box")
+	wires.shuffle()
 	set_wires(player_id, wires, true)
 	for wire in wire_scenes.values():
 		#wire.cuttable = false

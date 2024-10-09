@@ -30,6 +30,11 @@ grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("2_un7pd")
 
+[node name="Button" type="Button" parent="HBoxContainer"]
+visible = false
+layout_mode = 2
+text = "defbug"
+
 [node name="DeclareLabel" type="Label" parent="HBoxContainer"]
 layout_mode = 2
 text = "Defuse Wire:"
@@ -37,5 +42,7 @@ text = "Defuse Wire:"
 [node name="SpinBox" type="SpinBox" parent="HBoxContainer"]
 layout_mode = 2
 alignment = 1
+update_on_text_changed = true
 
+[connection signal="pressed" from="HBoxContainer/Button" to="." method="_on_button_pressed"]
 [connection signal="value_changed" from="HBoxContainer/SpinBox" to="." method="_on_spin_box_value_changed"]

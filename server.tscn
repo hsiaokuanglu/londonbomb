@@ -91,13 +91,9 @@ size_flags_horizontal = 8
 text = "Host (Debug)"
 
 [node name="RoleLabel" type="Label" parent="."]
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -51.5
-offset_right = 51.5
+offset_right = 103.0
 offset_bottom = 34.0
-grow_horizontal = 2
+theme = ExtResource("2_rryri")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="."]
 visible = false
@@ -135,6 +131,7 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="ClaimUI" type="VBoxContainer" parent="."]
+visible = false
 custom_minimum_size = Vector2(300, 200)
 anchors_preset = 3
 anchor_left = 1.0
@@ -261,7 +258,54 @@ visible = false
 position = Vector2(384, 690)
 
 [node name="MyWireBox" parent="." instance=ExtResource("3_75c7u")]
+visible = false
 position = Vector2(216, 1403)
+
+[node name="RoundCon" type="HBoxContainer" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -131.0
+offset_right = 131.0
+offset_bottom = 55.0
+grow_horizontal = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("2_rryri")
+
+[node name="RoundTimer" type="Timer" parent="RoundCon"]
+
+[node name="CountdownText" type="Label" parent="RoundCon"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Countdown:"
+uppercase = true
+
+[node name="CountdownNum" type="Label" parent="RoundCon"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "4"
+
+[node name="DefuseWireCon" type="HBoxContainer" parent="."]
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.04
+anchor_right = 0.5
+anchor_bottom = 0.04
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 40.0
+grow_horizontal = 2
+
+[node name="Label" type="Label" parent="DefuseWireCon"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Remaining Defused Wire:"
+
+[node name="Number" type="Label" parent="DefuseWireCon"]
+layout_mode = 2
+theme = ExtResource("2_rryri")
+text = "1"
 
 [connection signal="spinbox_value_change" from="DeclareWindow" to="." method="_on_declare_window_spinbox_value_change"]
 [connection signal="pressed" from="NetworkContainer/Join" to="." method="_on_join_pressed"]
