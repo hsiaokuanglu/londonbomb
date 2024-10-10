@@ -60,8 +60,19 @@ func play_cut():
 func _on_button_pressed() -> void:
 	wire_type = "safe_wire"
 	#set_wire_uncut_sprite()
-	play_cut()
+	#play_cut()
+	$Sprite.set_frame(3)
 
+func _set_cut_frame():
+	if wire_type == "defuse_wire":
+		$Sprite.set_frame(3)
+	elif wire_type == "safe_wire":
+		#$Sprite.play("safe_wire_cut2")
+		$Sprite.set_frame(3)
+	elif wire_type == "bomb":
+		$Sprite.set_frame(3)
+	else:
+		$Sprite.set_frame(0)
 
 func _on_mouse_entered() -> void:
 	print("mouse entered")

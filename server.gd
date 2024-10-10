@@ -22,6 +22,8 @@ var _new_global_card = Dictionary()
 var _already_cut: bool
 var _i_have_bomb: bool
 var _showing_declare: bool
+var role_name_good = "Good guy"
+var role_name_bad = "Bad guy"
 # UI Elements
 @onready
 var _ui_playerlist = $NetworkContainer/LobbyContainer/PlayerList
@@ -162,6 +164,7 @@ func _client_start_game(role):
 	_round = 4
 	_i_have_bomb = false
 	$DefuseWireCon/Number.text = str(_round)
+	$DefuseWireCon.show()
 	$RoundCon/CountdownNum.text = str(_round)
 	$MyWireBox.show()
 	$ScrollContainer.show()
@@ -178,19 +181,19 @@ func set_roles(ids) -> Dictionary:
 	var num_players = ids.size()
 	if 7 <= num_players:
 		for _i in range(5):
-			role_pool.append("Sherlock")
+			role_pool.append(role_name_good)
 		for _i in range(3):
-			role_pool.append("Moriarty")
+			role_pool.append(role_name_bad)
 	elif 6 <= num_players:
 		for _i in range(4):
-			role_pool.append("Sherlock")
+			role_pool.append(role_name_good)
 		for _i in range(2):
-			role_pool.append("Moriarty")
+			role_pool.append(role_name_bad)
 	elif 4 <= num_players:
 		for _i in range(3):
-			role_pool.append("Sherlock")
+			role_pool.append(role_name_good)
 		for _i in range(2):
-			role_pool.append("Moriarty")
+			role_pool.append(role_name_bad)
 	role_pool.shuffle()
 	ids.shuffle()
 	for i in range(num_players):
@@ -436,19 +439,27 @@ func next_round_timeout():
 func bomb_defused():
 	for id in _players.keys():
 
-		if _roles[id] == "Sherlock":
+		if _roles[id] == role_name_good:
 			rpc_id(id, "end_game_client", true)
 		else:
 			rpc_id(id, "end_game_client", false)
 
 func bomb_explodes():
 	for id in _players.keys():
+		rpc_id(id, "play_explosion")
 
-		if _roles[id] == "Sherlock":
-			rpc_id(id, "end_game_client", false)
-		else:
-			rpc_id(id, "end_game_client", true)
+@rpc("any_peer")
+func show_results(client_id):
+	if _roles[client_id] == role_name_good:
+		rpc_id(client_id, "end_game_client", false)
+	else:
+		rpc_id(client_id, "end_game_client", true)
 	#$Results.show()
+	
+@rpc
+func play_explosion():
+	$Results.show()
+	$Results/ExplodeAnimation.play("default")
 
 @rpc
 func end_game_client(win):
@@ -559,7 +570,7 @@ func client_wire_box_cut(cur_player_id, wire_data, wire_type):
 
 func _on_restart_button_pressed() -> void:
 	var t = Timer.new()
-	t.wait_time = 1
+	t.wait_time = 0.5
 	t.one_shot = true
 	t.timeout.connect(on_restart_timeout)
 	add_child(t)
@@ -606,3 +617,7 @@ func _on_wire_box_exit_button_pressed() -> void:
 func _on_others_wire_box_hide_wire_box() -> void:
 	for p_scene in _player_cards.values():
 		p_scene.show()
+
+
+func _on_explode_animation_animation_finished() -> void:
+	rpc_id(1, "show_results", multiplayer.get_unique_id())

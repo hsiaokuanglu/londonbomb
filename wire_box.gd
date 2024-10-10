@@ -50,7 +50,7 @@ func set_wires(player_id, wires, _already_cut):
 		if _already_cut:
 			wire_scene.cuttable = false
 		if wire_data["is_cut"]:
-			wire_scene.play_cut()
+			wire_scene._set_cut_frame()
 			wire_scene.cuttable = false
 		else:
 			wire_scene.set_wire_un_cut_hidden()
@@ -86,11 +86,12 @@ func update_wires(wires):
 			var wire_scene = wire_scenes[wire["id"]]
 			if not wire_scene.is_cut:
 				wire_scene.is_cut = true
-				wire_scene.play_cut()
+				wire_scene._set_cut_frame()
 
 func set_my_box(player_id, wires):
 	#$Sprite2D.hide()
 	$ExitButton.hide()
+	$Frame.hide()
 	wire_box_height = 50
 	wire_gap = 25
 	$Sprite2D.play("my_box")
@@ -128,6 +129,15 @@ func _on_button_2_pressed() -> void:
 					{"type": "safe_wire", "id": 2, "is_cut": false},
 					{"type": "safe_wire", "id": 3, "is_cut": true},
 					{"type": "bomb", "id": 4, "is_cut": false}])
+
+func _on_button_3_pressed():
+	set_wires(1111, 
+			[{"type": "defuse_wire", "id": 0, "is_cut": true},
+			{"type": "safe_wire", "id": 1, "is_cut": false},
+			{"type": "safe_wire", "id": 2, "is_cut": false},
+			{"type": "safe_wire", "id": 3, "is_cut": true},
+			{"type": "bomb", "id": 4, "is_cut": false}],
+			false)
 
 func play_cut_animation(wire_type):
 	for wire in wire_scenes.values():

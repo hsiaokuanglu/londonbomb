@@ -1,8 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://cvswvndtcipjd"]
+[gd_scene load_steps=7 format=3 uid="uid://cvswvndtcipjd"]
 
 [ext_resource type="Script" path="res://wire_box.gd" id="1_tf6at"]
 [ext_resource type="Texture2D" uid="uid://0k16b7vialao" path="res://art/box/my_box.png" id="2_wsakq"]
-[ext_resource type="Texture2D" uid="uid://m2m6ia77vijc" path="res://art/box.png" id="2_wxwxl"]
+[ext_resource type="Texture2D" uid="uid://ch5uw8mb60mm8" path="res://art/box/their_box.png" id="3_602kx"]
+[ext_resource type="Texture2D" uid="uid://bbv5p63q3fa3g" path="res://art/box/their_box_frame.png" id="4_4s3bd"]
 [ext_resource type="Theme" uid="uid://dss4hlpng3bfh" path="res://theme/default.tres" id="4_l6hjn"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_vdmcb"]
@@ -17,7 +18,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("2_wxwxl")
+"texture": ExtResource("3_602kx")
 }],
 "loop": true,
 "name": &"others_box",
@@ -30,16 +31,45 @@ script = ExtResource("1_tf6at")
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(-1, 0)
-scale = Vector2(0.8, 0.8)
+scale = Vector2(0.79, 0.79)
 sprite_frames = SubResource("SpriteFrames_vdmcb")
-animation = &"my_box"
+animation = &"others_box"
 
 [node name="Wires" type="Node2D" parent="."]
 
+[node name="Frame" type="Sprite2D" parent="."]
+position = Vector2(-3, -3)
+scale = Vector2(0.79, 0.79)
+texture = ExtResource("4_4s3bd")
+
+[node name="ExitButton" type="Button" parent="."]
+offset_left = -65.0
+offset_top = 280.0
+offset_right = 65.0
+offset_bottom = 345.0
+theme = ExtResource("4_l6hjn")
+text = "Exit"
+
+[node name="PlayerName" type="Label" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_top = -340.0
+offset_right = 30.0
+offset_bottom = -285.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("4_l6hjn")
+horizontal_alignment = 1
+
 [node name="Button2" type="Button" parent="."]
 visible = false
-offset_right = 101.0
-offset_bottom = 31.0
+offset_left = 43.0
+offset_top = -191.0
+offset_right = 144.0
+offset_bottom = -160.0
 text = "update wire"
 
 [node name="Button" type="Button" parent="."]
@@ -50,35 +80,15 @@ offset_right = 2.0
 offset_bottom = -145.0
 text = "set wire"
 
-[node name="ExitButton" type="Button" parent="."]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -36.0
-offset_top = 325.0
-offset_right = 43.0
-offset_bottom = 388.0
-grow_horizontal = 2
-grow_vertical = 2
-theme = ExtResource("4_l6hjn")
-text = "Exit"
+[node name="Button3" type="Button" parent="."]
+visible = false
+offset_left = 223.0
+offset_top = -187.0
+offset_right = 326.0
+offset_bottom = -156.0
+text = "test set wire"
 
-[node name="PlayerName" type="Label" parent="."]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_top = -150.0
-offset_right = 30.0
-offset_bottom = -95.0
-grow_horizontal = 2
-grow_vertical = 2
-theme = ExtResource("4_l6hjn")
-horizontal_alignment = 1
-
+[connection signal="pressed" from="ExitButton" to="." method="_on_exit_button_pressed"]
 [connection signal="pressed" from="Button2" to="." method="_on_button_2_pressed"]
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
-[connection signal="pressed" from="ExitButton" to="." method="_on_exit_button_pressed"]
+[connection signal="pressed" from="Button3" to="." method="_on_button_3_pressed"]
