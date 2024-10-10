@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dc22edjox7hof"
-path="res://.godot/imported/Untitled_Artwork-1.png-8432a99e5a484ad3b8b1d53dbcb1e01c.ctex"
+uid="uid://bjinld0y4v7j6"
+path="res://.godot/imported/wire_defuse_cut.png-a6714deaa18739f9445d4bde98b0430a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/default_cut/Untitled_Artwork-1.png"
-dest_files=["res://.godot/imported/Untitled_Artwork-1.png-8432a99e5a484ad3b8b1d53dbcb1e01c.ctex"]
+source_file="res://art/wire_defuse_cut.png"
+dest_files=["res://.godot/imported/wire_defuse_cut.png-a6714deaa18739f9445d4bde98b0430a.ctex"]
 
 [params]
 

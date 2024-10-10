@@ -32,7 +32,7 @@ func _clear_wire_scenes():
 		ch.queue_free()
 
 # wire["type"]
-# wire["id"]
+# wire["id"]s
 func set_wires(player_id, wires, _already_cut):
 	_clear_wire_scenes()
 	cur_player_id = player_id
@@ -51,6 +51,9 @@ func set_wires(player_id, wires, _already_cut):
 			wire_scene.cuttable = false
 		if wire_data["is_cut"]:
 			wire_scene.play_cut()
+			wire_scene.cuttable = false
+		else:
+			wire_scene.set_wire_un_cut_hidden()
 		pos_y += wire_gap
 		$Wires.add_child(wire_scene)
 		
@@ -66,26 +69,40 @@ func set_wires(player_id, wires, _already_cut):
 	
 	connect_wire_cut_signal()
 
+
+func new_update_wires(player_id, wire_data):
+	for wire in wire_data:
+		if wire["id"] in wire_scenes: # Invalid access when cut bomb
+			var wire_scene = wire_scenes[wire["id"]]
+			if wire["is_cut"]:
+				wire_scene.is_cut = true
+				wire_scene.play_cut()
+
+
 func update_wires(wires):
 	cur_wire_data = wires
 	for wire in wires:
 		if wire["is_cut"]:
 			var wire_scene = wire_scenes[wire["id"]]
-			wire_scene.is_cut = true
-			wire_scene.play_cut()
+			if not wire_scene.is_cut:
+				wire_scene.is_cut = true
+				wire_scene.play_cut()
 
 func set_my_box(player_id, wires):
-	$Sprite2D.hide()
+	#$Sprite2D.hide()
 	$ExitButton.hide()
 	wire_box_height = 50
 	wire_gap = 25
 	$Sprite2D.play("my_box")
 	wires.shuffle()
 	set_wires(player_id, wires, true)
+	$PlayerName.text = "My Wires"
+	$PlayerName.position = Vector2(0, -150)
 	for wire in wire_scenes.values():
 		#wire.cuttable = false
 		#print(wire.wire_type)
 		wire.set_wire_uncut_sprite()
+		wire.set_scale(Vector2(0.7, 0.7))
 
 
 func on_wire_cut(wire_type, wire_id) -> void:
@@ -112,6 +129,15 @@ func _on_button_2_pressed() -> void:
 					{"type": "safe_wire", "id": 3, "is_cut": true},
 					{"type": "bomb", "id": 4, "is_cut": false}])
 
+func play_cut_animation(wire_type):
+	for wire in wire_scenes.values():
+		if wire.wire_type == wire_type:
+			if not wire.is_cut:
+				wire.is_cut = true
+				wire.play_cut()
+				return
+			
+		
 
 func get_wire_data():
 	var wire_data_list = []

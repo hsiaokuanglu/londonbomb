@@ -5,8 +5,8 @@ var mouse_down := false
 var wire_type:= ""
 var wire_id: int
 var is_cut := false
+var wire_random_look = 1
 signal wire_cut
-
 
 func _on_wire_input_event(viewport: Node, event: InputEvent, shape_idx: int) -> void:
 	if mouse_down and cuttable:
@@ -23,27 +23,44 @@ func _input(event):
 			mouse_down = false
 
 func set_wire_uncut_sprite():
+	wire_random_look = randi_range(1,2)
 	if wire_type == "defuse_wire":
 		$Sprite.play("defuse_wire")
 	elif wire_type == "safe_wire":
-		$Sprite.play("safe_wire")
+		var x = str("safe_wire", str(wire_random_look))
+		$Sprite.play(x)
+	elif wire_type == "bomb":
+		$Sprite.play("bomb")
 	else:
 		$Sprite.play("default")
+
+
+
+func set_wire_un_cut_hidden():
+	wire_random_look = randi_range(1,2)
+	var x = str("safe_wire", str(wire_random_look))
+	$Sprite.play(x)
+
 
 func _on_other_wire_cut(_wire_type, _wire_id):
 	cuttable = false
 
 func play_cut():
 	if wire_type == "defuse_wire":
-		$Sprite.play("defuse_wire")
+		$Sprite.play("defuse_wire_cut")
 	elif wire_type == "safe_wire":
-		$Sprite.play("safe_wire")
+		#$Sprite.play("safe_wire_cut2")
+		$Sprite.play(str("safe_wire_cut", str(wire_random_look)))
+	elif wire_type == "bomb":
+		$Sprite.play("bomb_cut")
 	else:
 		$Sprite.play("cut")
 
 
 func _on_button_pressed() -> void:
-	$Sprite.play("safe_wire_cut")
+	wire_type = "safe_wire"
+	#set_wire_uncut_sprite()
+	play_cut()
 
 
 func _on_mouse_entered() -> void:

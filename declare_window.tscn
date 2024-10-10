@@ -1,48 +1,66 @@
-[gd_scene load_steps=4 format=3 uid="uid://bk15ap3u2cei8"]
+[gd_scene load_steps=5 format=3 uid="uid://bk15ap3u2cei8"]
 
 [ext_resource type="Script" path="res://declare_window.gd" id="1_6dydo"]
 [ext_resource type="Texture2D" uid="uid://m2m6ia77vijc" path="res://art/box.png" id="2_3dobg"]
 [ext_resource type="Theme" uid="uid://dss4hlpng3bfh" path="res://theme/default.tres" id="2_un7pd"]
+[ext_resource type="Texture2D" uid="uid://d11on1b80col8" path="res://art/ui/spinbox.png" id="4_bfbrd"]
 
 [node name="DeclareWindow" type="Window"]
 title = "Declare"
 initial_position = 1
-size = Vector2i(400, 100)
+size = Vector2i(440, 220)
 borderless = true
 always_on_top = true
 script = ExtResource("1_6dydo")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(10, 4)
+scale = Vector2(10, 10)
 texture = ExtResource("2_3dobg")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -193.0
-offset_top = -27.5
+offset_top = -45.0
 offset_right = 193.0
-offset_bottom = 27.5
+offset_bottom = 45.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("2_un7pd")
+theme_override_font_sizes/font_size = 55
+text = "I Have"
+horizontal_alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
 theme = ExtResource("2_un7pd")
 
-[node name="Button" type="Button" parent="HBoxContainer"]
+[node name="Button" type="Button" parent="VBoxContainer/HBoxContainer"]
 visible = false
 layout_mode = 2
 text = "defbug"
 
-[node name="DeclareLabel" type="Label" parent="HBoxContainer"]
+[node name="DeclareLabel" type="Label" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 text = "Defuse Wire:"
 
-[node name="SpinBox" type="SpinBox" parent="HBoxContainer"]
+[node name="SpinBox" type="SpinBox" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
+theme_override_icons/updown = ExtResource("4_bfbrd")
 alignment = 1
 update_on_text_changed = true
 
-[connection signal="pressed" from="HBoxContainer/Button" to="." method="_on_button_pressed"]
-[connection signal="value_changed" from="HBoxContainer/SpinBox" to="." method="_on_spin_box_value_changed"]
+[node name="ExitButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("2_un7pd")
+text = "Exit"
+
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/Button" to="." method="_on_button_pressed"]
+[connection signal="value_changed" from="VBoxContainer/HBoxContainer/SpinBox" to="." method="_on_spin_box_value_changed"]
+[connection signal="pressed" from="VBoxContainer/ExitButton" to="." method="_on_exit_button_pressed"]

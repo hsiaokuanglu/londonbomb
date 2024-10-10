@@ -4,10 +4,10 @@ var multiplayer_peer = WebSocketMultiplayerPeer.new()
 var key_path = "res://ssl/selfsigned.key"
 var cert_path = "res://ssl/selfsigned.crt"
 var port = 8765
-#var url = "wss://luraykuang1998.online:80"
-#var debug = false
-var debug = true
-var url = "ws://localhost:8765" # change TLSOptions.client()
+var url = "wss://luraykuang1998.online:80"
+var debug = false
+#var debug = true
+#var url = "ws://localhost:8765" # change TLSOptions.client()
 #var connected_peer_ids = []
 var local_player_character
 var _players = Dictionary()
@@ -257,8 +257,10 @@ func shuffle_wires():
 func deal_cards_server(round_i):
 	_cards["pool"].shuffle()
 	if _new_global_card["in_play"].size() != 0:
+		# if this is not the first round
 		_cards["pool"] = shuffle_wires()
-	print(_cards["pool"])
+	#print(_cards["pool"])
+	print(_new_global_card["in_play"])
 	for id in _players.keys():
 		var hand = []
 		var new_hand = []
@@ -297,9 +299,7 @@ func _set_player_grid(players):
 func _next_round_client(round):
 	_round = round
 	_i_have_bomb = false
-	# TODO
-	$DeclareWindow.get_node("HBoxContainer/SpinBox").get_line_edit().set_text("0")
-	$DeclareWindow.get_node("HBoxContainer/SpinBox").apply()
+	$DeclareWindow._set_spinbox_value(0)
 	$ClaimUI/HaveBombButton.text = "No Bomb"
 	$RoundCon/CountdownNum.text = str(round)
 	#$WireBoxWindow.hide()
@@ -311,7 +311,7 @@ func _next_round_client(round):
 			update_player_scene_have_bomb(id, false)
 
 # server
-func _next_round():
+func _next_round(): # server
 	
 	if _round == 1:
 		bomb_explodes()
@@ -458,6 +458,7 @@ func end_game_client(win):
 		$Results/Label.text = "WIN!"
 	else:
 		$Results/Label.text = "LOSE!"
+	$Results/RestartButton.show()
 	$Results.show()
 
 
@@ -505,13 +506,18 @@ func set_uncut_wire_count(picked_id, wire_hand, wire_id):
 func show_new_wire_box(their_id):
 
 	$OthersWireBox.set_wires(their_id, _new_global_card["in_play"][their_id], _already_cut)
-	$OthersWireBox.update_wires(_new_global_card["in_play"][their_id])
+	#$OthersWireBox.update_wires(_new_global_card["in_play"][their_id])
 	$OthersWireBox.show()
 	for p_scene in _player_cards.values():
 		p_scene.hide()
 
 @rpc("any_peer")
 func update_global_card_after_cut(player_id, wire_data, wire_type):
+	# if my wires got cut
+	if player_id == multiplayer.get_unique_id():
+		print("i got cut")
+		#play the wire but in my wire box
+		$MyWireBox.play_cut_animation(wire_type)
 	if wire_type == "defuse_wire":
 		_defuse_wire_cut += 1
 		$DefuseWireCon/Number.text = str(_players.keys().size() - _defuse_wire_cut)
@@ -527,7 +533,7 @@ func update_global_card_after_cut(player_id, wire_data, wire_type):
 		p_card.update_uncut_wire_count(w_count)
 
 	if $OthersWireBox.cur_player_id == player_id:
-		$OthersWireBox.set_wires(player_id, wire_data, _already_cut)
+		$OthersWireBox.new_update_wires(player_id, wire_data)
 
 func update_player_scene_uncut_wire_count():
 	pass
@@ -552,8 +558,27 @@ func client_wire_box_cut(cur_player_id, wire_data, wire_type):
 	#print(cur_player_id, wire_type, wire_data)
 
 func _on_restart_button_pressed() -> void:
+	var t = Timer.new()
+	t.wait_time = 1
+	t.one_shot = true
+	t.timeout.connect(on_restart_timeout)
+	add_child(t)
+	t.start()
+	wait_for_restart()
+	rpc("wait_for_restart")
+
+
+func on_restart_timeout():
+	rpc_id(1, "_set_player_grid_server")
 	rpc_id(1, "_server_start_game")
-	$Results.hide()
+
+@rpc("any_peer")
+func wait_for_restart():
+	$Results/RestartButton.hide()
+	for ch in $ScrollContainer/PlayerGrid.get_children():
+		$ScrollContainer/PlayerGrid.remove_child(ch)
+		ch.queue_free()
+	
 
 @rpc("any_peer")
 func update_player_scene_have_bomb(their_id, they_have_bomb: bool):
@@ -571,7 +596,7 @@ func _on_have_bomb_button_pressed() -> void:
 	for id in _players.keys():
 		if id != multiplayer.get_unique_id():
 			rpc_id(id, "update_player_scene_have_bomb", multiplayer.get_unique_id(), _i_have_bomb)
-		
+
 
 
 func _on_wire_box_exit_button_pressed() -> void:

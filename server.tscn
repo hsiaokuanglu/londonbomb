@@ -131,7 +131,6 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="ClaimUI" type="VBoxContainer" parent="."]
-visible = false
 custom_minimum_size = Vector2(300, 200)
 anchors_preset = 3
 anchor_left = 1.0
@@ -258,10 +257,10 @@ visible = false
 position = Vector2(384, 690)
 
 [node name="MyWireBox" parent="." instance=ExtResource("3_75c7u")]
-visible = false
-position = Vector2(216, 1403)
+position = Vector2(249, 1463)
 
 [node name="RoundCon" type="HBoxContainer" parent="."]
+visible = false
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
@@ -287,6 +286,7 @@ size_flags_horizontal = 8
 text = "4"
 
 [node name="DefuseWireCon" type="HBoxContainer" parent="."]
+visible = false
 anchors_preset = -1
 anchor_left = 0.5
 anchor_top = 0.04
@@ -307,6 +307,7 @@ layout_mode = 2
 theme = ExtResource("2_rryri")
 text = "1"
 
+[connection signal="declare_exit_press" from="DeclareWindow" to="." method="_on_declare_button_pressed"]
 [connection signal="spinbox_value_change" from="DeclareWindow" to="." method="_on_declare_window_spinbox_value_change"]
 [connection signal="pressed" from="NetworkContainer/Join" to="." method="_on_join_pressed"]
 [connection signal="pressed" from="NetworkContainer/SettingsContainer/NameCon/SettingsApplyButton" to="." method="_on_settings_apply_button_pressed"]
